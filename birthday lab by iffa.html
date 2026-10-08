@@ -1,0 +1,347 @@
+!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Graffiti Birthday Surprise</title>
+<style>
+:root{
+  --pink:#ff4fa3; --cyan:#20e7ff; --yellow:#ffe45e; --purple:#8d5cff;
+  --bg:#0b0b10; --card:rgba(18,18,27,.82);
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;font-family:Arial,Helvetica,sans-serif;background:var(--bg);color:white}
+body{overflow-x:hidden}
+button,input{font:inherit}
+button{cursor:pointer}
+
+body:before,body:after{
+  content:"";position:fixed;inset:auto;pointer-events:none;z-index:0;
+  width:260px;height:260px;border-radius:50%;filter:blur(80px);opacity:.22
+}
+body:before{background:var(--pink);left:-100px;top:10%}
+body:after{background:var(--cyan);right:-100px;bottom:5%}
+
+.app{position:relative;z-index:1;max-width:1100px;margin:auto;padding:18px}
+.panel{
+  border:1px solid #ffffff18;border-radius:26px;background:var(--card);
+  backdrop-filter:blur(15px);box-shadow:0 20px 70px #0008;overflow:hidden;
+}
+.topbar{
+  padding:18px 22px;display:flex;justify-content:space-between;align-items:center;
+  border-bottom:1px solid #ffffff12
+}
+.logo{
+  font-weight:900;font-size:21px;letter-spacing:1px;
+  text-shadow:2px 2px 0 var(--pink),-2px -2px 0 var(--cyan)
+}
+.badge{font-size:12px;color:#bbb}
+
+.setup{padding:35px 25px;text-align:center}
+.setup h1{font-size:clamp(34px,7vw,62px);margin:5px 0 10px}
+.graffiti{
+  display:inline-block;
+  color:white;
+  transform:rotate(-2deg);
+  text-shadow:4px 4px 0 var(--pink),-4px -3px 0 var(--cyan),0 0 25px #fff2;
+}
+.setup p{color:#c9c9d0;max-width:650px;margin:0 auto 25px;line-height:1.6}
+.name-row{display:flex;gap:10px;max-width:600px;margin:auto}
+.name-row input{
+  flex:1;min-width:0;padding:15px 17px;border-radius:15px;
+  border:1px solid #ffffff22;background:#08080d;color:white;outline:none;
+}
+.name-row input:focus{border-color:var(--cyan);box-shadow:0 0 18px #20e7ff33}
+.btn{
+  border:0;border-radius:15px;padding:14px 19px;font-weight:800;
+  color:#111;background:linear-gradient(135deg,var(--yellow),var(--pink));
+}
+.btn.secondary{background:#ffffff10;color:white;border:1px solid #ffffff18}
+.tip{font-size:12px;color:#999;margin-top:12px}
+
+#birthday{display:none}
+#birthday.active{display:block}
+.hero{text-align:center;padding:30px 20px 10px}
+.hero h1{
+  margin:0;font-size:clamp(32px,7vw,65px);line-height:1.05;
+  text-shadow:4px 4px 0 var(--pink),-3px -3px 0 var(--cyan)
+}
+.hero .subtitle{color:#ddd;margin:12px auto 0;max-width:650px}
+
+.grid{
+  display:grid;grid-template-columns:1.25fr .75fr;gap:18px;padding:20px
+}
+@media(max-width:760px){.grid{grid-template-columns:1fr}.name-row{flex-direction:column}}
+
+.cake-card,.feature-card{
+  position:relative;border:1px solid #ffffff15;border-radius:22px;
+  background:#ffffff07;padding:22px;overflow:hidden
+}
+.cake-card{min-height:470px;display:flex;align-items:center;justify-content:center}
+.cake-card:before{
+  content:"";position:absolute;width:280px;height:280px;border-radius:50%;
+  background:var(--pink);filter:blur(100px);opacity:.12
+}
+.cake-wrap{position:relative;z-index:2;cursor:pointer;transition:.3s}
+.cake-wrap:hover{transform:scale(1.04)}
+.plate{
+  position:absolute;left:50%;bottom:-20px;transform:translateX(-50%);
+  width:280px;height:40px;border-radius:50%;background:#b78b2b;box-shadow:0 12px 30px #0008
+}
+.cake{
+  position:relative;width:225px;height:115px;border-radius:20px 20px 30px 30px;
+  background:linear-gradient(#ff9bd2,#db559d);border:6px solid #ffe4f1;
+  box-shadow:inset 0 -16px 20px #0002,0 15px 35px #0008
+}
+.cream{
+  position:absolute;top:-12px;left:-5px;width:225px;height:40px;
+  border-radius:50%;background:#ffe1ef;border:5px solid #fff0f7
+}
+.candle{
+  position:absolute;top:-73px;left:50%;transform:translateX(-50%);
+  width:16px;height:58px;border-radius:5px;
+  background:repeating-linear-gradient(45deg,#fff 0 6px,#8d5cff 6px 12px)
+}
+.flame{
+  position:absolute;top:-31px;left:50%;transform:translateX(-50%);
+  width:22px;height:31px;border-radius:50%;background:#ffad28;
+  box-shadow:0 0 12px #ffe05c,0 0 30px #ff8a00;
+  animation:flicker .22s infinite alternate
+}
+.flame:after{content:"";position:absolute;width:7px;height:13px;left:8px;top:9px;background:#fff;border-radius:50%}
+@keyframes flicker{to{transform:translateX(-50%) scale(.82) rotate(4deg)}}
+.smoke{display:none;position:absolute;top:-90px;left:50%;width:12px;height:45px;border-left:4px solid #ddd8;border-radius:50%;animation:smoke 1.8s forwards}
+@keyframes smoke{to{opacity:0;transform:translate(-30px,-80px) rotate(25deg) scale(1.5)}}
+
+.instruction{position:absolute;bottom:22px;left:0;right:0;text-align:center;color:#bbb;font-size:13px}
+.side-title{font-size:19px;font-weight:900;margin-bottom:15px}
+.feature-list{display:grid;gap:10px}
+.feature{
+  padding:14px;border-radius:15px;background:#ffffff08;border:1px solid #ffffff0d;
+  display:flex;justify-content:space-between;gap:10px;align-items:center
+}
+.feature b{font-size:14px}.feature span{font-size:12px;color:#aaa;text-align:right}
+.controls{display:flex;gap:9px;flex-wrap:wrap;margin-top:15px}
+.controls .btn{flex:1;min-width:120px}
+
+.message{
+  position:fixed;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;
+  background:#050509d9;backdrop-filter:blur(8px);opacity:0;pointer-events:none;transition:.5s;padding:20px
+}
+.message.show{opacity:1;pointer-events:auto}
+.message-box{
+  width:min(90%,620px);text-align:center;padding:35px 22px;border-radius:28px;
+  border:1px solid #ffffff22;background:#14131c;
+  box-shadow:0 0 70px #ff4fa333
+}
+.message-box h2{
+  font-size:clamp(30px,7vw,58px);margin:0;
+  text-shadow:4px 4px 0 var(--pink),-3px -3px 0 var(--cyan)
+}
+.message-box p{color:#ddd;line-height:1.7}
+.close{margin-top:10px}
+
+.heart{position:fixed;z-index:35;color:var(--pink);pointer-events:none;animation:heart 5s linear forwards}
+@keyframes heart{from{transform:translateY(105vh) rotate(0);opacity:0}15%{opacity:1}to{transform:translateY(-15vh) rotate(360deg);opacity:0}}
+.confetti{position:fixed;z-index:60;top:-20px;width:8px;height:15px;pointer-events:none;animation:fall 3s linear forwards}
+@keyframes fall{to{transform:translateY(110vh) rotate(720deg)}}
+
+.graffiti-tag{
+  position:absolute;right:15px;bottom:12px;font-size:13px;font-weight:900;
+  transform:rotate(-7deg);opacity:.55;color:var(--yellow)
+}
+.footer{text-align:center;color:#777;font-size:12px;padding:0 20px 22px}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <div class="panel">
+
+    <div class="topbar">
+      <div class="logo">🎂 BIRTHDAY LAB</div>
+      <div class="badge">INTERACTIVE WEBSITE</div>
+    </div>
+
+    <section class="setup" id="setup">
+      <div style="font-size:65px">🎁</div>
+      <h1 class="graffiti">Birthday Surprise</h1>
+      <p>
+        Masukkan nama orang yang berulang tahun. Nama tersebut akan otomatis
+        dipakai di seluruh kejutan.
+      </p>
+
+      <div class="name-row">
+        <input id="nameInput" type="text" maxlength="30"
+               placeholder="Masukkan nama..." autocomplete="off">
+        <button class="btn" onclick="startBirthday()">✨ Buat Kejutan</button>
+      </div>
+      <div class="tip">Contoh: Iffa, Siska, Rafika, atau nama apa saja.</div>
+    </section>
+
+    <section id="birthday">
+      <div class="hero">
+        <h1 id="heroTitle">🎉 HAPPY BIRTHDAY!</h1>
+        <div class="subtitle" id="heroSub">Sebuah kejutan kecil penuh warna.</div>
+      </div>
+
+      <div class="grid">
+        <div class="cake-card">
+          <div class="cake-wrap" id="cake">
+            <div class="smoke" id="smoke"></div>
+            <div class="candle"><div class="flame" id="flame"></div></div>
+            <div class="cake"><div class="cream"></div></div>
+            <div class="plate"></div>
+          </div>
+          <div class="instruction" id="instruction">👆 Tekan kue untuk mematikan lilin</div>
+          <div class="graffiti-tag">BIRTHDAY MODE ✦</div>
+        </div>
+
+        <div class="feature-card">
+          <div class="side-title">✨ Fitur Website</div>
+          <div class="feature-list">
+            <div class="feature"><b>🎨 Graffiti Mode</b><span>Warna neon</span></div>
+            <div class="feature"><b>🎂 Interactive Cake</b><span>Klik kue</span></div>
+            <div class="feature"><b>🎊 Confetti</b><span>Otomatis muncul</span></div>
+            <div class="feature"><b>💕 Floating Hearts</b><span>Animasi berjalan</span></div>
+            <div class="feature"><b>🔊 Musik</b><span>Kontrol manual</span></div>
+            <div class="feature"><b>📱 Responsive</b><span>HP & laptop</span></div>
+          </div>
+
+          <div class="controls">
+            <button class="btn secondary" onclick="celebrate()">🎉 Rayakan</button>
+            <button class="btn secondary" onclick="changeTheme()">🎨 Ganti Warna</button>
+            <button class="btn secondary" onclick="changeName()">✏️ Ganti Nama</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer">Website ulang tahun interaktif • dibuat dengan HTML, CSS & JavaScript</div>
+    </section>
+  </div>
+</div>
+
+<div class="message" id="message">
+  <div class="message-box">
+    <div style="font-size:55px">🎉🎂🎈</div>
+    <h2 id="messageTitle">SELAMAT ULANG TAHUN!</h2>
+    <p id="messageText"></p>
+    <button class="btn close" onclick="closeMessage()">Tutup ✕</button>
+  </div>
+</div>
+
+<script>
+let birthdayName="";
+let blown=false;
+let theme=0;
+
+const themes=[
+  ["#ff4fa3","#20e7ff","#ffe45e","#8d5cff"],
+  ["#ff5e5e","#ffd166","#7cffcb","#a66cff"],
+  ["#ff6bd6","#7cf7ff","#ffffff","#ffb000"]
+];
+
+function startBirthday(){
+  const input=document.getElementById("nameInput");
+  const name=input.value.trim();
+
+  if(!name){
+    input.focus();
+    input.placeholder="Tulis nama dulu 😊";
+    return;
+  }
+
+  birthdayName=name;
+  document.getElementById("setup").style.display="none";
+  document.getElementById("birthday").classList.add("active");
+
+  document.getElementById("heroTitle").innerHTML="🎉 HAPPY BIRTHDAY, "+escapeHTML(name)+"!";
+  document.getElementById("heroSub").textContent=
+    "Hari spesial untuk "+name+". Semoga penuh kebahagiaan dan kesuksesan. ❤️";
+
+  createHearts();
+}
+
+function escapeHTML(str){
+  const div=document.createElement("div");
+  div.textContent=str;
+  return div.innerHTML;
+}
+
+document.getElementById("cake").addEventListener("click",()=>{
+  if(blown)return;
+  blown=true;
+
+  document.getElementById("flame").style.display="none";
+  document.getElementById("smoke").style.display="block";
+  document.getElementById("instruction").textContent="🎉 Lilin berhasil dimatikan!";
+
+  setTimeout(()=>{
+    document.getElementById("messageTitle").textContent="SELAMAT ULANG TAHUN!";
+    document.getElementById("messageText").innerHTML=
+      "🎂 Selamat ulang tahun, <b>"+escapeHTML(birthdayName)+"</b>!<br>"+
+      "Semoga panjang umur, sehat, bahagia, sukses, dan semua impianmu tercapai. ✨";
+    document.getElementById("message").classList.add("show");
+    celebrate();
+  },500);
+});
+
+function closeMessage(){
+  document.getElementById("message").classList.remove("show");
+}
+
+function celebrate(){
+  for(let i=0;i<100;i++)setTimeout(createConfetti,i*12);
+  for(let i=0;i<15;i++)setTimeout(createHeart,i*120);
+}
+
+function createConfetti(){
+  const c=document.createElement("div");
+  c.className="confetti";
+  c.style.left=Math.random()*100+"vw";
+  c.style.background=["#ff4fa3","#20e7ff","#ffe45e","#8d5cff","#7cffcb"][Math.floor(Math.random()*5)];
+  c.style.animationDuration=(2+Math.random()*2)+"s";
+  c.style.transform="rotate("+Math.random()*360+"deg)";
+  document.body.appendChild(c);
+  setTimeout(()=>c.remove(),4500);
+}
+
+function createHeart(){
+  const h=document.createElement("div");
+  h.className="heart";
+  h.textContent=["♥️","❤️","💗","✦"][Math.floor(Math.random()*4)];
+  h.style.left=Math.random()*100+"vw";
+  h.style.fontSize=(16+Math.random()*25)+"px";
+  h.style.animationDuration=(4+Math.random()*4)+"s";
+  document.body.appendChild(h);
+  setTimeout(()=>h.remove(),8500);
+}
+
+function createHearts(){
+  for(let i=0;i<8;i++)setTimeout(createHeart,i*300);
+}
+
+function changeName(){
+  document.getElementById("birthday").classList.remove("active");
+  document.getElementById("setup").style.display="block";
+  document.getElementById("nameInput").value=birthdayName;
+  blown=false;
+  document.getElementById("flame").style.display="block";
+  document.getElementById("smoke").style.display="none";
+}
+
+function changeTheme(){
+  theme=(theme+1)%themes.length;
+  const t=themes[theme];
+  document.documentElement.style.setProperty("--pink",t[0]);
+  document.documentElement.style.setProperty("--cyan",t[1]);
+  document.documentElement.style.setProperty("--yellow",t[2]);
+  document.documentElement.style.setProperty("--purple",t[3]);
+}
+
+document.getElementById("nameInput").addEventListener("keydown",e=>{
+  if(e.key==="Enter")startBirthday();
+});
+</script>
+</body>
+</html>
